@@ -1,7 +1,12 @@
-import Database from "better-sqlite3";
 import path from "path";
+import { createRequire } from "module";
 import { app } from "electron";
+import { fileURLToPath } from "url";
 
+const require = createRequire(import.meta.url);
+const Database = require("better-sqlite3");
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dbPath = path.join(app.getPath("userData"), "toniq.db");
 const db = new Database(dbPath);
 
