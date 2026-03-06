@@ -1,4 +1,5 @@
 import { app, BrowserWindow, ipcMain } from "electron";
+import db from "./database";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
@@ -67,12 +68,57 @@ app.on("activate", () => {
   }
 });
 
+/**
+ * Saves full session
+ */
 ipcMain.handle("db:saveSession", (_event, data) => {
-  // lógica SQLite aqui
+  const { session, answers } = data;
+
+  const insertSession = db.prepare(`
+    INSERT INTO sessions (date, mode, score, total, duration_ms)
+    VALUES (@date, @mode, @score, @total, @duration_ms)
+  `);
+
+  const insertAnswer = db.prepare(`
+    INSERT INTO answers (session_id, question, correct_answer, user_answer, response_time_ms)
+    VALUES (@session_id, @question, @correct_answer, @user_answer, @response_time_ms)
+  `);
+
+  // Saves session and answers all at once
+  const saveAll = db.transaction((session, answers) => {
+    const { lastInsertRowid } = insertSession.run(session);
+
+    for (const answer of answers) {
+      insertAnswer.run({ ...answer, session_id: lastInsertRowid });
+    }
+    return lastInsertRowid;
+  });
+
+  return saveAll(session, answers);
 });
 
+/**
+ * Returns full history
+ */
 ipcMain.handle("db:getHistory", () => {
-  // lógica SQLite aqui
+  return db.prepare("SELECT * FROM sessions ORDER BY date DESC").all();
+});
+
+/**
+ * Save Settings
+ */
+ipcMain.handle("db:setSetting", (_event, key, value) => {
+  db.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)").run(
+    key,
+    value,
+  );
+});
+
+/**
+ * Search settings
+ */
+ipcMain.handle("db:getSetting", (_event, key) => {
+  return db.prepare("SELECT value FROM settings WHERE key = ?").get(key);
 });
 
 ipcMain.handle("audio:play", (_event, config) => {
