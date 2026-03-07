@@ -1,4 +1,9 @@
-import { playTestSound } from "./audio/AudioEngine";
+import {
+  playChord,
+  playInterval,
+  stopAll,
+  playProgression,
+} from "./audio/AudioEngine";
 import "./App.css";
 
 function App() {
@@ -17,9 +22,6 @@ function App() {
           </p>
           <button className="btn-primary w-full">Começar</button>
           <button className="btn-ghost w-full">Ver histórico</button>
-          <button className="btn-warning w-full" onClick={playTestSound}>
-            Testar som
-          </button>
         </div>
       </div>
     </>
