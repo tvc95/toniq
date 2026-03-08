@@ -5,8 +5,15 @@ import {
   playProgression,
 } from "./audio/AudioEngine";
 import "./App.css";
+import { useExercise } from "./hooks/useExercise";
 
 function App() {
+  const exercise = useExercise({
+    mode: "intervals",
+    difficulty: "beginner",
+    totalQuestions: 5,
+  });
+
   return (
     <>
       <div className="min-h-screen flex items-center justify-center">

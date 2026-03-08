@@ -1,0 +1,137 @@
+import { useState, useRef, useCallback } from "react";
+import { generateQuestion } from "../audio/generateQuestion";
+import { playInterval, playChord } from "../audio/AudioEngine";
+import { evaluateDifficulty } from "../audio/adaptiveDifficulty";
+import type {
+  Difficulty,
+  ExerciseConfig,
+  ExerciseResult,
+  Question,
+} from "../types/db";
+
+interface ExerciseState {
+  status: "idle" | "playing" | "answered" | "finished";
+  current: Question | null;
+  questionIndex: number;
+  results: ExerciseResult[];
+  score: number;
+  difficulty: Difficulty;
+}
+
+export function useExercise(config: ExerciseConfig) {
+  const [state, setState] = useState<ExerciseState>({
+    status: "idle",
+    current: null,
+    questionIndex: 0,
+    results: [],
+    score: 0,
+    difficulty: config.difficulty,
+  });
+
+  const startedAt = useRef<number>(0);
+
+  const playCurrentQuestion = useCallback(
+    async (question: Question) => {
+      if (config.mode === "intervals") {
+        await playInterval(
+          question.rootNote,
+          question.correct,
+          question.playMode as "ascending" | "descending" | "harmonic",
+        );
+      } else {
+        await playChord(
+          question.rootNote,
+          question.correct,
+          question.playMode as "block" | "arpeggio",
+        );
+      }
+    },
+    [config.mode],
+  );
+
+  const startSession = useCallback(async () => {
+    const question = generateQuestion({
+      ...config,
+      difficulty: config.difficulty,
+    });
+    startedAt.current = Date.now();
+
+    setState({
+      status: "playing",
+      current: question,
+      questionIndex: 0,
+      results: [],
+      score: 0,
+      difficulty: config.difficulty,
+    });
+
+    await playCurrentQuestion(question);
+  }, [config, playCurrentQuestion]);
+
+  const replay = useCallback(async () => {
+    if (state.current) await playCurrentQuestion(state.current);
+  }, [state.current, playCurrentQuestion]);
+
+  const answer = useCallback(
+    (userAnswer: string) => {
+      if (!state.current || state.status !== "playing") return;
+
+      const isCorrect = userAnswer === state.current.correct;
+      const responseTime = Date.now() - startedAt.current;
+      const points = isCorrect ? 10 : -3;
+
+      const result: ExerciseResult = {
+        question: state.current,
+        userAnswer,
+        isCorrect,
+        responseTime_ms: responseTime,
+      };
+
+      const newResults = [...state.results, result];
+      const newScore = Math.max(0, state.score + points);
+      const newDifficulty = evaluateDifficulty(newResults, state.difficulty);
+      const isLast = state.questionIndex + 1 >= config.totalQuestions;
+
+      if (isLast) {
+        stop();
+        setState((s) => ({
+          ...s,
+          status: "finished",
+          results: newResults,
+          score: newScore,
+          difficulty: newDifficulty,
+        }));
+        return;
+      }
+
+      setState((s) => ({
+        ...s,
+        status: "answered",
+        results: newResults,
+        score: newScore,
+        difficulty: newDifficulty,
+        current: { ...s.current!, _feedback: isCorrect } as any,
+      }));
+
+      setTimeout(async () => {
+        const next = generateQuestion({ ...config, difficulty: newDifficulty });
+        startedAt.current = Date.now();
+        setState((s) => ({
+          ...s,
+          status: "playing",
+          current: next,
+          questionIndex: s.questionIndex + 1,
+        }));
+        await playCurrentQuestion(next);
+      }, 1500);
+    },
+    [state, config, playCurrentQuestion],
+  );
+
+  return {
+    ...state,
+    startSession,
+    replay,
+    answer,
+  };
+}
