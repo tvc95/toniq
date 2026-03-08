@@ -1,12 +1,7 @@
 import * as Tone from "tone";
-import {
-  INTERVALS,
-  CHORDS,
-  transposeNote,
-  randomRootNote,
-} from "./musicTheoryData";
+import { INTERVALS, CHORDS, transposeNote } from "./musicTheoryData";
 
-// Synth polifônico — toca múltiplas notas ao mesmo tempo
+// Polyphonic Synth sound
 const synth = new Tone.PolySynth(Tone.Synth, {
   oscillator: { type: "triangle" },
   envelope: {
@@ -17,22 +12,25 @@ const synth = new Tone.PolySynth(Tone.Synth, {
   },
 }).toDestination();
 
-// Garante que o contexto de áudio está ativo
 async function start() {
   if (Tone.getContext().state !== "running") {
     await Tone.start();
   }
 }
 
-// Toca um intervalo entre duas notas
-// mode: 'ascending' | 'descending' | 'harmonic'
+/**
+ * Plays an interval between two notes
+ * @param root
+ * @param intervalName
+ * @param mode 'ascending' | 'descending' | 'harmonic'
+ */
 export async function playInterval(
+  root: string,
   intervalName: string,
   mode: "ascending" | "descending" | "harmonic" = "ascending",
 ) {
   await start();
 
-  const root = randomRootNote();
   const semitones = INTERVALS[intervalName];
   const second = transposeNote(root, semitones);
 
@@ -58,15 +56,19 @@ export async function playInterval(
   }
 }
 
-// Toca um acorde
-// mode: 'block' (simultâneo) | 'arpeggio' (quebrado)
+/**
+ * Plays a chord
+ * @param root
+ * @param chordType
+ * @param mode 'block' (simultaneous) | 'arpeggio'
+ */
 export async function playChord(
+  root: string,
   chordType: string,
   mode: "block" | "arpeggio" = "block",
 ) {
   await start();
 
-  const root = randomRootNote();
   const notes = CHORDS[chordType].map((n) => transposeNote(root, n));
 
   Tone.getTransport().stop();
@@ -86,6 +88,11 @@ export async function playChord(
   }
 }
 
+/**
+ * Plays a progression
+ * @param chords
+ * @param tempo
+ */
 export async function playProgression(
   chords: { rootNote: string; chordType: string }[],
   tempo: number = 80,
@@ -110,7 +117,9 @@ export async function playProgression(
   Tone.getTransport().start();
 }
 
-// Para todo áudio imediatamente
+/**
+ * Stops all audio immediately
+ */
 export function stopAll() {
   Tone.getTransport().stop();
   Tone.getTransport().cancel();
