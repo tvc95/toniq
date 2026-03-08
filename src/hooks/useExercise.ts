@@ -94,6 +94,25 @@ export function useExercise(config: ExerciseConfig) {
 
       if (isLast) {
         stop();
+
+        const sessionData = {
+          session: {
+            date: new Date().toISOString(),
+            mode: config.mode,
+            score: newScore,
+            total: config.totalQuestions,
+            duration_ms: Date.now() - startedAt.current,
+          },
+          answers: newResults.map((result) => ({
+            question: result.question.correct,
+            correct_answer: result.question.correct,
+            user_answer: userAnswer,
+            response_time_ms: result.responseTime_ms,
+          })),
+        };
+
+        window.api.saveSession(sessionData);
+
         setState((s) => ({
           ...s,
           status: "finished",
