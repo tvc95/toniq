@@ -1,7 +1,13 @@
 import { useState, useRef, useCallback } from "react";
 import { generateQuestion } from "../audio/generateQuestion";
 import { playInterval, playChord } from "../audio/AudioEngine";
-import type { ExerciseConfig, ExerciseResult, Question } from "../types/db";
+import { evaluateDifficulty } from "../audio/adaptiveDifficulty";
+import type {
+  Difficulty,
+  ExerciseConfig,
+  ExerciseResult,
+  Question,
+} from "../types/db";
 
 interface ExerciseState {
   status: "idle" | "playing" | "answered" | "finished";
@@ -9,6 +15,7 @@ interface ExerciseState {
   questionIndex: number;
   results: ExerciseResult[];
   score: number;
+  difficulty: Difficulty;
 }
 
 export function useExercise(config: ExerciseConfig) {
@@ -18,6 +25,7 @@ export function useExercise(config: ExerciseConfig) {
     questionIndex: 0,
     results: [],
     score: 0,
+    difficulty: config.difficulty,
   });
 
   const startedAt = useRef<number>(0);
@@ -42,7 +50,10 @@ export function useExercise(config: ExerciseConfig) {
   );
 
   const startSession = useCallback(async () => {
-    const question = generateQuestion(config);
+    const question = generateQuestion({
+      ...config,
+      difficulty: config.difficulty,
+    });
     startedAt.current = Date.now();
 
     setState({
@@ -51,17 +62,16 @@ export function useExercise(config: ExerciseConfig) {
       questionIndex: 0,
       results: [],
       score: 0,
+      difficulty: config.difficulty,
     });
 
     await playCurrentQuestion(question);
   }, [config, playCurrentQuestion]);
 
-  // Reproduz a questão atual novamente
   const replay = useCallback(async () => {
     if (state.current) await playCurrentQuestion(state.current);
   }, [state.current, playCurrentQuestion]);
 
-  // Responde a questão atual
   const answer = useCallback(
     (userAnswer: string) => {
       if (!state.current || state.status !== "playing") return;
@@ -79,6 +89,7 @@ export function useExercise(config: ExerciseConfig) {
 
       const newResults = [...state.results, result];
       const newScore = Math.max(0, state.score + points);
+      const newDifficulty = evaluateDifficulty(newResults, state.difficulty);
       const isLast = state.questionIndex + 1 >= config.totalQuestions;
 
       if (isLast) {
@@ -88,6 +99,7 @@ export function useExercise(config: ExerciseConfig) {
           status: "finished",
           results: newResults,
           score: newScore,
+          difficulty: newDifficulty,
         }));
         return;
       }
@@ -97,12 +109,12 @@ export function useExercise(config: ExerciseConfig) {
         status: "answered",
         results: newResults,
         score: newScore,
+        difficulty: newDifficulty,
         current: { ...s.current!, _feedback: isCorrect } as any,
       }));
 
-      // Avança para próxima questão após 1.5s
       setTimeout(async () => {
-        const next = generateQuestion(config);
+        const next = generateQuestion({ ...config, difficulty: newDifficulty });
         startedAt.current = Date.now();
         setState((s) => ({
           ...s,
