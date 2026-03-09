@@ -57,8 +57,10 @@ export function transposeNote(note: string, semitones: number): string {
   const octave = parseInt(note.slice(-1));
   const name = note.slice(0, -1);
   const index = CHROMATIC_NOTES.indexOf(name);
-  const newIndex = (index + semitones) % 12;
-  const newOctave = octave + Math.floor((index + semitones) / 12);
+  const total = index + semitones;
+
+  const newIndex = ((total % 12) + 12) % 12;
+  const newOctave = octave + Math.floor(total / 12);
   return `${CHROMATIC_NOTES[newIndex]}${newOctave}`;
 }
 
