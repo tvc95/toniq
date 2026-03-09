@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import type { ExerciseConfig } from "../../types/db";
+import logo from "../../assets/toniq-logo.png";
 
 const MODES = [
   {
@@ -39,19 +40,17 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen p-8 space-y-10">
+    <div className="min-h-screen space-y-10">
       <header className="flex items-center justify-between">
         <div>
-          <h1
-            className="text-4xl font-bold"
-            style={{ color: "var(--color-primary)" }}
-          >
-            Toniq
-          </h1>
+          <div>
+            <img src={logo} alt="TonIQ logo" className="w-32 h-auto" />
+          </div>
           <p className="mt-1" style={{ color: "var(--color-text-secondary)" }}>
             Treine seu ouvido musical
           </p>
         </div>
+
         <button className="btn-ghost" onClick={() => navigate("/history")}>
           📊 Histórico
         </button>
