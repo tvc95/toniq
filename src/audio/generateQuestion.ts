@@ -1,4 +1,9 @@
-import { INTERVALS, CHORDS, randomRootNote } from "./musicTheoryData";
+import {
+  INTERVALS,
+  CHORDS,
+  randomRootNote,
+  transposeNote,
+} from "./musicTheoryData";
 import type { Question, ExerciseConfig } from "../types/db";
 
 const INTERVAL_POOLS = {
@@ -20,6 +25,65 @@ const CHORD_POOLS = {
   beginner: ["Maior", "Menor"],
   intermediate: ["Maior", "Menor", "Diminuto", "Aumentado"],
   advanced: Object.keys(CHORDS),
+};
+
+const PROGRESSION_POOLS = {
+  beginner: [
+    {
+      name: "I – IV – V – I",
+      degrees: ["I", "IV", "V", "I"],
+      chords: ["Maior", "Maior", "Maior", "Maior"],
+    },
+    {
+      name: "I – V – I",
+      degrees: ["I", "V", "I"],
+      chords: ["Maior", "Maior", "Maior"],
+    },
+  ],
+  intermediate: [
+    {
+      name: "I – IV – V – I",
+      degrees: ["I", "IV", "V", "I"],
+      chords: ["Maior", "Maior", "Maior", "Maior"],
+    },
+    {
+      name: "I – V – vi – IV",
+      degrees: ["I", "V", "VI", "IV"],
+      chords: ["Maior", "Maior", "Menor", "Maior"],
+    },
+    {
+      name: "I – vi – IV – V",
+      degrees: ["I", "VI", "IV", "V"],
+      chords: ["Maior", "Menor", "Maior", "Maior"],
+    },
+  ],
+  advanced: [
+    {
+      name: "I – V – vi – IV",
+      degrees: ["I", "V", "VI", "IV"],
+      chords: ["Maior", "Maior", "Menor", "Maior"],
+    },
+    {
+      name: "ii – V – I",
+      degrees: ["II", "V", "I"],
+      chords: ["Menor", "Dominante (7)", "Maior"],
+    },
+    {
+      name: "I – vi – ii – V",
+      degrees: ["I", "VI", "II", "V"],
+      chords: ["Maior", "Menor", "Menor", "Dominante (7)"],
+    },
+  ],
+};
+
+const DEGREE_SEMITONES: Record<string, number> = {
+  I: 0,
+  II: 2,
+  III: 4,
+  IV: 5,
+  V: 7,
+  VI: 9,
+  VII: 11,
 };
 
 /**
@@ -84,18 +148,27 @@ export function generateQuestion(config: ExerciseConfig): Question {
   }
 
   // [TEMPORARY]: FOR PROGRESSIONS (THIS CODE WILL BE DELETED IN A FUTURE VERSION)
-  const pool = CHORD_POOLS[difficulty];
+  const pool = PROGRESSION_POOLS[difficulty];
   const correct = pool[Math.floor(Math.random() * pool.length)];
   const wrongs = sample(
-    pool.filter((c) => c !== correct),
+    pool.filter((p) => p.name !== correct.name),
     3,
   );
-  const options = shuffle([correct, ...wrongs]);
+  const options = shuffle([correct, ...wrongs]).map((p) => p.name);
+
+  const root = randomRootNote();
+
+  // Monta os acordes da progressão com notas reais
+  const progression = correct.chords.map((chordType, i) => ({
+    rootNote: transposeNote(root, DEGREE_SEMITONES[correct.degrees[i]]),
+    chordType,
+  }));
 
   return {
-    rootNote: randomRootNote(),
-    correct,
+    rootNote: root,
+    correct: correct.name,
     options,
     playMode: "block",
+    progression,
   };
 }

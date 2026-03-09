@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useExercise } from "../../hooks/useExercise";
 import type { ExerciseConfig } from "../../types/db";
+import { stopAll } from "../../audio/AudioEngine";
 
 export default function Exercise() {
   const location = useLocation();
@@ -39,7 +40,10 @@ export default function Exercise() {
       <header className="flex items-center justify-between">
         <button
           className="btn-ghost px-3 py-2 text-sm"
-          onClick={() => navigate("/")}
+          onClick={() => {
+            stopAll();
+            navigate("/");
+          }}
         >
           ← Sair
         </button>

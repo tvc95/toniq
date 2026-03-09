@@ -33,6 +33,7 @@ export interface Question {
   correct: string;
   options: string[];
   playMode: "ascending" | "descending" | "harmonic" | "block" | "arpeggio";
+  progression?: { rootNote: string; chordType: string }[];
 }
 
 export interface ExerciseResult {

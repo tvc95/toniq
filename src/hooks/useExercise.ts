@@ -1,13 +1,19 @@
-import { useState, useRef, useCallback } from "react";
-import { generateQuestion } from "../audio/generateQuestion";
-import { playInterval, playChord } from "../audio/AudioEngine";
-import { evaluateDifficulty } from "../audio/adaptiveDifficulty";
 import type {
   Difficulty,
   ExerciseConfig,
   ExerciseResult,
   Question,
 } from "../types/db";
+
+import { useState, useRef, useCallback } from "react";
+import { generateQuestion } from "../audio/generateQuestion";
+import { evaluateDifficulty } from "../audio/adaptiveDifficulty";
+import {
+  playInterval,
+  playChord,
+  playProgression,
+  stopAll,
+} from "../audio/AudioEngine";
 
 interface ExerciseState {
   status: "idle" | "playing" | "answered" | "finished";
@@ -38,12 +44,14 @@ export function useExercise(config: ExerciseConfig) {
           question.correct,
           question.playMode as "ascending" | "descending" | "harmonic",
         );
-      } else {
+      } else if (config.mode === "chords") {
         await playChord(
           question.rootNote,
           question.correct,
           question.playMode as "block" | "arpeggio",
         );
+      } else if (config.mode === "progressions" && question.progression) {
+        await playProgression(question.progression, 80);
       }
     },
     [config.mode],
@@ -75,6 +83,8 @@ export function useExercise(config: ExerciseConfig) {
   const answer = useCallback(
     (userAnswer: string) => {
       if (!state.current || state.status !== "playing") return;
+
+      stopAll();
 
       const isCorrect = userAnswer === state.current.correct;
       const responseTime = Date.now() - startedAt.current;
