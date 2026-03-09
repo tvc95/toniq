@@ -1,13 +1,20 @@
-import { useState, useRef, useCallback } from "react";
-import { generateQuestion } from "../audio/generateQuestion";
-import { playInterval, playChord } from "../audio/AudioEngine";
-import { evaluateDifficulty } from "../audio/adaptiveDifficulty";
 import type {
   Difficulty,
   ExerciseConfig,
   ExerciseResult,
   Question,
 } from "../types/db";
+
+import { useState, useRef, useCallback } from "react";
+import { generateQuestion } from "../audio/generateQuestion";
+import { evaluateDifficulty } from "../audio/adaptiveDifficulty";
+import { useProgress } from "./useProgress";
+import {
+  playInterval,
+  playChord,
+  playProgression,
+  stopAll,
+} from "../audio/AudioEngine";
 
 interface ExerciseState {
   status: "idle" | "playing" | "answered" | "finished";
@@ -19,6 +26,8 @@ interface ExerciseState {
 }
 
 export function useExercise(config: ExerciseConfig) {
+  const { saveSession } = useProgress();
+
   const [state, setState] = useState<ExerciseState>({
     status: "idle",
     current: null,
@@ -38,12 +47,14 @@ export function useExercise(config: ExerciseConfig) {
           question.correct,
           question.playMode as "ascending" | "descending" | "harmonic",
         );
-      } else {
+      } else if (config.mode === "chords") {
         await playChord(
           question.rootNote,
           question.correct,
           question.playMode as "block" | "arpeggio",
         );
+      } else if (config.mode === "progressions" && question.progression) {
+        await playProgression(question.progression, 80);
       }
     },
     [config.mode],
@@ -76,6 +87,8 @@ export function useExercise(config: ExerciseConfig) {
     (userAnswer: string) => {
       if (!state.current || state.status !== "playing") return;
 
+      stopAll();
+
       const isCorrect = userAnswer === state.current.correct;
       const responseTime = Date.now() - startedAt.current;
       const points = isCorrect ? 10 : -3;
@@ -93,7 +106,24 @@ export function useExercise(config: ExerciseConfig) {
       const isLast = state.questionIndex + 1 >= config.totalQuestions;
 
       if (isLast) {
-        stop();
+        const sessionData = {
+          session: {
+            date: new Date().toISOString(),
+            mode: config.mode,
+            score: newScore,
+            total: config.totalQuestions,
+            duration_ms: Date.now() - startedAt.current,
+          },
+          answers: newResults.map((result) => ({
+            question: result.question.correct,
+            correct_answer: result.question.correct,
+            user_answer: result.userAnswer,
+            response_time_ms: result.responseTime_ms,
+          })),
+        };
+
+        saveSession(sessionData);
+
         setState((s) => ({
           ...s,
           status: "finished",

@@ -1,10 +1,8 @@
 import { app, BrowserWindow, ipcMain } from "electron";
 import db from "./database";
-import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
-const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // The built directory structure
@@ -32,6 +30,9 @@ let win: BrowserWindow | null;
 function createWindow() {
   win = new BrowserWindow({
     icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
+    width: 760,
+    height: 680,
+    resizable: false,
     webPreferences: {
       preload: path.join(__dirname, "preload.mjs"),
     },
@@ -119,10 +120,6 @@ ipcMain.handle("db:setSetting", (_event, key, value) => {
  */
 ipcMain.handle("db:getSetting", (_event, key) => {
   return db.prepare("SELECT value FROM settings WHERE key = ?").get(key);
-});
-
-ipcMain.handle("audio:play", (_event, config) => {
-  // lógica de áudio aqui
 });
 
 app.whenReady().then(createWindow);

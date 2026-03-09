@@ -2,7 +2,6 @@ import { app, BrowserWindow, ipcMain } from "electron";
 import path from "path";
 import { createRequire } from "module";
 import { fileURLToPath } from "url";
-import { createRequire as createRequire$1 } from "node:module";
 import { fileURLToPath as fileURLToPath$1 } from "node:url";
 import path$1 from "node:path";
 const require$1 = createRequire(import.meta.url);
@@ -35,7 +34,6 @@ db.exec(`
     value TEXT NOT NULL
   );
 `);
-createRequire$1(import.meta.url);
 const __dirname$1 = path$1.dirname(fileURLToPath$1(import.meta.url));
 process.env.APP_ROOT = path$1.join(__dirname$1, "..");
 const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
@@ -46,6 +44,9 @@ let win;
 function createWindow() {
   win = new BrowserWindow({
     icon: path$1.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
+    width: 760,
+    height: 680,
+    resizable: false,
     webPreferences: {
       preload: path$1.join(__dirname$1, "preload.mjs")
     }
@@ -100,8 +101,6 @@ ipcMain.handle("db:setSetting", (_event, key, value) => {
 });
 ipcMain.handle("db:getSetting", (_event, key) => {
   return db.prepare("SELECT value FROM settings WHERE key = ?").get(key);
-});
-ipcMain.handle("audio:play", (_event, config) => {
 });
 app.whenReady().then(createWindow);
 export {

@@ -9,5 +9,4 @@ contextBridge.exposeInMainWorld("api", {
   setSetting: (key: SettingKey, value: string) =>
     ipcRenderer.invoke("db.setSetting", key, value),
   getSetting: (key: SettingKey) => ipcRenderer.invoke("db.getSetting", key),
-  playAudio: (cfg: any) => ipcRenderer.invoke("audio:play", cfg),
 });
