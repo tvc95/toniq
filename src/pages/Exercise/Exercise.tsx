@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useExercise } from "../../hooks/useExercise";
 import type { ExerciseConfig } from "../../types/db";
@@ -8,10 +8,13 @@ export default function Exercise() {
   const location = useLocation();
   const navigate = useNavigate();
   const config = location.state as ExerciseConfig;
+  const started = useRef(false);
 
   const exercise = useExercise(config);
 
   useEffect(() => {
+    if (started.current) return;
+    started.current = true;
     exercise.startSession();
   }, []);
 

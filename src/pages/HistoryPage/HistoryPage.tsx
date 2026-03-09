@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useProgress } from "../../hooks/useProgress";
 import type { Session } from "../../types/db";
 
 const MODE_LABEL = {
@@ -15,15 +16,11 @@ const MODE_COLOR = {
 };
 
 export default function HistoryPage() {
+  const { sessions, loading, loadHistory } = useProgress();
   const navigate = useNavigate();
-  const [sessions, setSessions] = useState<Session[]>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    window.api
-      .getHistory()
-      .then((data) => setSessions(data))
-      .finally(() => setLoading(false));
+    loadHistory();
   }, []);
 
   const totalSessions = sessions.length;

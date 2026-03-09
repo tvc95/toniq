@@ -8,6 +8,7 @@ import type {
 import { useState, useRef, useCallback } from "react";
 import { generateQuestion } from "../audio/generateQuestion";
 import { evaluateDifficulty } from "../audio/adaptiveDifficulty";
+import { useProgress } from "./useProgress";
 import {
   playInterval,
   playChord,
@@ -25,6 +26,8 @@ interface ExerciseState {
 }
 
 export function useExercise(config: ExerciseConfig) {
+  const { saveSession } = useProgress();
+
   const [state, setState] = useState<ExerciseState>({
     status: "idle",
     current: null,
@@ -121,7 +124,7 @@ export function useExercise(config: ExerciseConfig) {
           })),
         };
 
-        window.api.saveSession(sessionData);
+        saveSession(sessionData);
 
         setState((s) => ({
           ...s,
