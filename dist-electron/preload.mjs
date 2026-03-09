@@ -1,8 +1,1 @@
-"use strict";
-const electron = require("electron");
-electron.contextBridge.exposeInMainWorld("api", {
-  saveSession: (data) => electron.ipcRenderer.invoke("db:saveSession", data),
-  getHistory: () => electron.ipcRenderer.invoke("db:getHistory"),
-  setSetting: (key, value) => electron.ipcRenderer.invoke("db.setSetting", key, value),
-  getSetting: (key) => electron.ipcRenderer.invoke("db.getSetting", key)
-});
+"use strict";const t=require("electron");t.contextBridge.exposeInMainWorld("api",{saveSession:e=>t.ipcRenderer.invoke("db:saveSession",e),getHistory:()=>t.ipcRenderer.invoke("db:getHistory"),setSetting:(e,i)=>t.ipcRenderer.invoke("db.setSetting",e,i),getSetting:e=>t.ipcRenderer.invoke("db.getSetting",e)});

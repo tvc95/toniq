@@ -1,15 +1,10 @@
-import { app, BrowserWindow, ipcMain } from "electron";
-import path from "path";
-import { createRequire } from "module";
-import { fileURLToPath } from "url";
-import { fileURLToPath as fileURLToPath$1 } from "node:url";
-import path$1 from "node:path";
-const require$1 = createRequire(import.meta.url);
-const Database = require$1("better-sqlite3");
-path.dirname(fileURLToPath(import.meta.url));
-const dbPath = path.join(app.getPath("userData"), "toniq.db");
-const db = new Database(dbPath);
-db.exec(`
+import { app as o, BrowserWindow as d, ipcMain as r } from "electron";
+import O from "path";
+import { createRequire as u } from "module";
+import { fileURLToPath as w } from "node:url";
+import s from "node:path";
+const S = u(import.meta.url), A = S("better-sqlite3"), U = O.join(o.getPath("userData"), "toniq.db"), n = new A(U);
+n.exec(`
   CREATE TABLE IF NOT EXISTS sessions (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     date        TEXT    NOT NULL,
@@ -34,77 +29,58 @@ db.exec(`
     value TEXT NOT NULL
   );
 `);
-const __dirname$1 = path$1.dirname(fileURLToPath$1(import.meta.url));
-process.env.APP_ROOT = path$1.join(__dirname$1, "..");
-const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
-const MAIN_DIST = path$1.join(process.env.APP_ROOT, "dist-electron");
-const RENDERER_DIST = path$1.join(process.env.APP_ROOT, "dist");
-process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path$1.join(process.env.APP_ROOT, "public") : RENDERER_DIST;
-let win;
-function createWindow() {
-  win = new BrowserWindow({
-    icon: path$1.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
+const R = s.dirname(w(import.meta.url));
+process.env.APP_ROOT = s.join(R, "..");
+const E = process.env.VITE_DEV_SERVER_URL, C = s.join(process.env.APP_ROOT, "dist-electron"), c = s.join(process.env.APP_ROOT, "dist");
+process.env.VITE_PUBLIC = E ? s.join(process.env.APP_ROOT, "public") : c;
+let e;
+function N() {
+  e = new d({
+    icon: s.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
     width: 760,
     height: 680,
-    resizable: false,
+    resizable: !1,
     webPreferences: {
-      preload: path$1.join(__dirname$1, "preload.mjs")
+      preload: s.join(R, "preload.mjs")
     }
-  });
-  win.webContents.on("did-finish-load", () => {
-    win == null ? void 0 : win.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
-  });
-  if (VITE_DEV_SERVER_URL) {
-    win.loadURL(VITE_DEV_SERVER_URL);
-  } else {
-    win.loadFile(path$1.join(RENDERER_DIST, "index.html"));
-  }
+  }), e.webContents.on("did-finish-load", () => {
+    e == null || e.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
+  }), E ? e.loadURL(E) : e.loadFile(s.join(c, "index.html"));
 }
-app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
-    app.quit();
-    win = null;
-  }
+o.on("window-all-closed", () => {
+  process.platform !== "darwin" && (o.quit(), e = null);
 });
-app.on("activate", () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
-  }
+o.on("activate", () => {
+  d.getAllWindows().length === 0 && N();
 });
-ipcMain.handle("db:saveSession", (_event, data) => {
-  const { session, answers } = data;
-  const insertSession = db.prepare(`
+r.handle("db:saveSession", (a, t) => {
+  const { session: i, answers: l } = t, p = n.prepare(`
     INSERT INTO sessions (date, mode, score, total, duration_ms)
     VALUES (@date, @mode, @score, @total, @duration_ms)
-  `);
-  const insertAnswer = db.prepare(`
+  `), _ = n.prepare(`
     INSERT INTO answers (session_id, question, correct_answer, user_answer, response_time_ms)
     VALUES (@session_id, @question, @correct_answer, @user_answer, @response_time_ms)
   `);
-  const saveAll = db.transaction((session2, answers2) => {
-    const { lastInsertRowid } = insertSession.run(session2);
-    for (const answer of answers2) {
-      insertAnswer.run({ ...answer, session_id: lastInsertRowid });
+  return n.transaction(
+    (L, I) => {
+      const { lastInsertRowid: T } = p.run(L);
+      for (const m of I)
+        _.run({ ...m, session_id: T });
+      return T;
     }
-    return lastInsertRowid;
-  });
-  return saveAll(session, answers);
+  )(i, l);
 });
-ipcMain.handle("db:getHistory", () => {
-  return db.prepare("SELECT * FROM sessions ORDER BY date DESC").all();
-});
-ipcMain.handle("db:setSetting", (_event, key, value) => {
-  db.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)").run(
-    key,
-    value
+r.handle("db:getHistory", () => n.prepare("SELECT * FROM sessions ORDER BY date DESC").all());
+r.handle("db:setSetting", (a, t, i) => {
+  n.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)").run(
+    t,
+    i
   );
 });
-ipcMain.handle("db:getSetting", (_event, key) => {
-  return db.prepare("SELECT value FROM settings WHERE key = ?").get(key);
-});
-app.whenReady().then(createWindow);
+r.handle("db:getSetting", (a, t) => n.prepare("SELECT value FROM settings WHERE key = ?").get(t));
+o.whenReady().then(N);
 export {
-  MAIN_DIST,
-  RENDERER_DIST,
-  VITE_DEV_SERVER_URL
+  C as MAIN_DIST,
+  c as RENDERER_DIST,
+  E as VITE_DEV_SERVER_URL
 };
