@@ -2,6 +2,9 @@
   "name": "toniq",
   "private": true,
   "version": "1.0.0",
+  "author": {
+    "name": "tvc95"
+  },
   "description": "Ear training app for musicians",
   "type": "module",
   "scripts": {

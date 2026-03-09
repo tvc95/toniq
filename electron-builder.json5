@@ -4,7 +4,7 @@
   appId: "com.toniq.app",
   asar: true,
   productName: "TonIQ",
-  copyright: "Copyright © 2026 TonIQ",
+  copyright: "Copyright © 2026 tvc95",
   directories: {
     output: "release/${version}",
   },
