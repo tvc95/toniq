@@ -106,8 +106,6 @@ export function useExercise(config: ExerciseConfig) {
       const isLast = state.questionIndex + 1 >= config.totalQuestions;
 
       if (isLast) {
-        stop();
-
         const sessionData = {
           session: {
             date: new Date().toISOString(),
@@ -119,7 +117,7 @@ export function useExercise(config: ExerciseConfig) {
           answers: newResults.map((result) => ({
             question: result.question.correct,
             correct_answer: result.question.correct,
-            user_answer: userAnswer,
+            user_answer: result.userAnswer,
             response_time_ms: result.responseTime_ms,
           })),
         };

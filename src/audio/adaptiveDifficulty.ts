@@ -1,12 +1,12 @@
 import type { Difficulty, ExerciseResult } from "../types/db";
 
 // CONSTANTS
-const WINDOW = 10;
+const WINDOW = 5;
 const UP_THRESH = 0.8;
 const DOWN_THRESH = 0.4;
 
 /**
- * Monitors rate of correct answers from the last 10 questions. If rate >= 80%,
+ * Monitors rate of correct answers from the last 5 questions. If rate >= 80%,
  * increase difficulty. If rate < 40%, decrease difficulty.
  * @param results
  * @param current
