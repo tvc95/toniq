@@ -1,7 +1,6 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useProgress } from "../../hooks/useProgress";
-import type { Session } from "../../types/db";
 
 const MODE_LABEL = {
   intervals: "Intervalos",
