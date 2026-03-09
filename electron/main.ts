@@ -86,14 +86,16 @@ ipcMain.handle("db:saveSession", (_event, data) => {
   `);
 
   // Saves session and answers all at once
-  const saveAll = db.transaction((session, answers) => {
-    const { lastInsertRowid } = insertSession.run(session);
+  const saveAll = db.transaction(
+    (session: Record<string, unknown>, answers: Record<string, unknown>[]) => {
+      const { lastInsertRowid } = insertSession.run(session);
 
-    for (const answer of answers) {
-      insertAnswer.run({ ...answer, session_id: lastInsertRowid });
-    }
-    return lastInsertRowid;
-  });
+      for (const answer of answers) {
+        insertAnswer.run({ ...answer, session_id: lastInsertRowid });
+      }
+      return lastInsertRowid;
+    },
+  );
 
   return saveAll(session, answers);
 });

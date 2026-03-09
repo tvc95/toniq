@@ -2,6 +2,7 @@
   "name": "toniq",
   "private": true,
   "version": "1.0.0",
+  "description": "Ear training app for musicians",
   "type": "module",
   "scripts": {
     "dev": "vite",
