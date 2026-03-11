@@ -1,6 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useExercise } from "../../hooks/useExercise";
+import { Waveform } from "../../components/Waveform/Waveform";
 import type { ExerciseConfig } from "../../types/db";
 import { stopAll } from "../../audio/AudioEngine";
 
@@ -11,6 +12,16 @@ export default function Exercise() {
   const started = useRef(false);
 
   const exercise = useExercise(config);
+
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  useEffect(() => {
+    setIsPlaying(true);
+  }, [])
+
+  useEffect(() => {
+    return () => setIsPlaying(false);
+  }, [])
 
   useEffect(() => {
     if (started.current) return;
@@ -29,6 +40,11 @@ export default function Exercise() {
       });
     }
   }, [exercise.status]);
+
+  async function handleReplay() {
+    stopAll();
+    await exercise.replay();
+  }
 
   if (!exercise.current) {
     return (
@@ -50,6 +66,7 @@ export default function Exercise() {
         >
           ← Sair
         </button>
+
         <div className="flex items-center gap-4">
           <span
             className="text-sm"
@@ -81,7 +98,7 @@ export default function Exercise() {
 
       <div className="flex flex-col items-center gap-3 py-6">
         <button
-          onClick={exercise.replay}
+          onClick={handleReplay}
           disabled={exercise.status === "answered"}
           className="w-24 h-24 rounded-full text-4xl font-bold transition-all duration-150 active:scale-95 disabled:opacity-40"
           style={{
@@ -93,6 +110,7 @@ export default function Exercise() {
         >
           🔊
         </button>
+        <Waveform isPlaying={isPlaying} />
         <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
           {exercise.status === "answered"
             ? "Aguarde..."
