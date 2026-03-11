@@ -25,6 +25,13 @@ interface ExerciseState {
   difficulty: Difficulty;
 }
 
+/**
+ * Hook that manages the state of an ear training exercise session. 
+ * Provides functions to start the session, answer questions, and replay the current question. 
+ * The state includes user progress, score, and adaptive difficulty.
+ * @param config 
+ * @returns an object containing the current exercise state and functions to control the session.
+ */
 export function useExercise(config: ExerciseConfig) {
   const { saveSession } = useProgress();
 

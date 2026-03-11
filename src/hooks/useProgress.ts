@@ -1,6 +1,12 @@
 import { useState, useCallback } from "react";
 import type { Session, SaveSessionData } from "../types/db";
 
+/**
+ * Hook that manages user progress and session history for ear training exercises.
+ * Provides functions to save session data and load user history from the database.
+ * @returns An object containing the current sessions, loading state, and functions 
+ * to save and load sessions.
+ */
 export function useProgress() {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(false);
