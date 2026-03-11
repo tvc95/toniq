@@ -1,12 +1,21 @@
 import { useRef, useEffect, useCallback } from 'react'
 import * as Tone from 'tone'
 
+/**
+ * Hook for audio visualization using the Web Audio API's AnalyserNode.
+ * Connects the AnalyserNode to the Tone.js destination and draws the waveform on a canvas.
+ * @param canvasRef 
+ * @returns Functions to start and stop the visualization animation.
+ */
 export function useVisualizer(canvasRef: React.RefObject<HTMLCanvasElement>) {
   const analyserRef = useRef<AnalyserNode | null>(null);
   const animationIdRef = useRef<number>(0);
   const isRunningRef = useRef<boolean>(false);
 
-  // Conecta o AnalyserNode ao destino do Tone.js
+  /**
+   * Sets up the AnalyserNode and connects it to the Tone.js destination.
+   * Must be called before starting the animation.
+   */
   const setup = useCallback(() => {
     const audioContext = Tone.getContext().rawContext as AudioContext;
     const analyser = audioContext.createAnalyser();
@@ -19,7 +28,10 @@ export function useVisualizer(canvasRef: React.RefObject<HTMLCanvasElement>) {
     analyserRef.current = analyser;
   }, []);
 
-  // Starts animation
+  /**
+   * Starts the visualization animation.
+   * Must be called after setup() to ensure the AnalyserNode is configured.
+   */
   const start = useCallback(() => {
     if (isRunningRef.current || !canvasRef.current) return;
 
@@ -63,7 +75,7 @@ export function useVisualizer(canvasRef: React.RefObject<HTMLCanvasElement>) {
       ctx.beginPath();
 
       const sliceWidth = canvas.width / bufferLength;
-      let x = 0
+      let x = 0;
 
       for (let i = 0; i < bufferLength; i++) {
         const v = dataArray[i] / 128.0;
@@ -83,4 +95,43 @@ export function useVisualizer(canvasRef: React.RefObject<HTMLCanvasElement>) {
     draw();
 
   }, [ canvasRef, setup ]);
+
+  /**
+   * Stops the visualization animation and starts a gradual fade-out effect.
+   * Should be called to clean up the animation and connections when they are no longer needed.
+   */
+  const stop = useCallback(() => {
+    isRunningRef.current = false;
+    cancelAnimationFrame(animationIdRef.current);
+
+    if (!canvasRef.current) return;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d')!;
+
+    // Fade out gradual
+    let opacity = 1;
+    const fadeOut = () => {
+      if (opacity <= 0) {
+        ctx.fillStyle = '#0F0F13';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        return;
+      }
+
+      ctx.fillStyle = `rgba(15, 15, 19, 0.1)`;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      opacity -= 0.05;
+      requestAnimationFrame(fadeOut);
+    };
+
+    fadeOut();
+  }, [canvasRef]);
+
+  useEffect(() => {
+    return () => {
+      isRunningRef.current = false;
+      cancelAnimationFrame(animationIdRef.current);
+    };
+  }, []);
+
+  return { start, stop };
 }
