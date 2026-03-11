@@ -15,7 +15,8 @@
     "format": "prettier --write \"src/**/*.{ts,tsx}\" \"electron/**/*.ts\"",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "better-sqlite3": "^12.6.2",

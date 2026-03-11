@@ -72,10 +72,7 @@ r.handle("db:saveSession", (a, t) => {
 });
 r.handle("db:getHistory", () => n.prepare("SELECT * FROM sessions ORDER BY date DESC").all());
 r.handle("db:setSetting", (a, t, i) => {
-  n.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)").run(
-    t,
-    i
-  );
+  n.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)").run(t, i);
 });
 r.handle("db:getSetting", (a, t) => n.prepare("SELECT value FROM settings WHERE key = ?").get(t));
 o.whenReady().then(N);

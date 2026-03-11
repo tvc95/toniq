@@ -13,6 +13,7 @@ dist-ssr
 *.local
 
 release
+test-results
 
 # Editor directories and files
 .vscode/*
