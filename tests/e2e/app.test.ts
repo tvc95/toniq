@@ -29,7 +29,7 @@ test.describe('Exercises', () => {
 
   test('exhibits 4 answer options in Intervals exercises', async ({ page }) => {
     await page.getByText('Intervalos').click()
-    const options = page.locator('button.btn-ghost')
+    const options = page.locator('button.py-4.px-3.rounded-lg.font-semibold.text-sm.transition-all')
     await expect(options).toHaveCount(4)
   })
 
