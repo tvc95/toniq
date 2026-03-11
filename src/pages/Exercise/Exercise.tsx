@@ -27,7 +27,7 @@ export default function Exercise() {
     if (started.current) return;
     started.current = true;
     exercise.startSession();
-  }, []);
+  }, [exercise]);
 
   useEffect(() => {
     if (exercise.status === "finished") {
@@ -39,7 +39,7 @@ export default function Exercise() {
         },
       });
     }
-  }, [exercise.status]);
+  }, [config, exercise.results, exercise.score, exercise.status, navigate]);
 
   async function handleReplay() {
     stopAll();

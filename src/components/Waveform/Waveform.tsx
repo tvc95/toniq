@@ -20,7 +20,7 @@ export function Waveform({ isPlaying }: WaveformProps) {
     } else {
       stop();
     }
-  }, [isPlaying]);
+  }, [isPlaying, start, stop]);
 
   return (
     <canvas
