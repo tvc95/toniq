@@ -1,12 +1,12 @@
-import path from "path";
-import { createRequire } from "module";
-import { app } from "electron";
+import path from 'path'
+import { createRequire } from 'module'
+import { app } from 'electron'
 
-const require = createRequire(import.meta.url);
-const Database = require("better-sqlite3");
+const require = createRequire(import.meta.url)
+const Database = require('better-sqlite3')
 
-const dbPath = path.join(app.getPath("userData"), "toniq.db");
-const db = new Database(dbPath);
+const dbPath = path.join(app.getPath('userData'), 'toniq.db')
+const db = new Database(dbPath)
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS sessions (
@@ -32,6 +32,6 @@ db.exec(`
     key   TEXT PRIMARY KEY,
     value TEXT NOT NULL
   );
-`);
+`)
 
-export default db;
+export default db

@@ -1,9 +1,9 @@
-import "./App.css";
-import { Routes, Route } from "react-router-dom";
-import HomePage from "./pages/HomePage/HomePage";
-import HistoryPage from "./pages/HistoryPage/HistoryPage";
-import Exercise from "./pages/Exercise/Exercise";
-import Results from "./pages/Results/Results";
+import './App.css'
+import { Routes, Route } from 'react-router-dom'
+import HomePage from './pages/HomePage/HomePage'
+import HistoryPage from './pages/HistoryPage/HistoryPage'
+import Exercise from './pages/Exercise/Exercise'
+import Results from './pages/Results/Results'
 
 export default function App() {
   return (
@@ -13,5 +13,5 @@ export default function App() {
       <Route path="/results" element={<Results />} />
       <Route path="/history" element={<HistoryPage />} />
     </Routes>
-  );
+  )
 }
