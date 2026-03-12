@@ -34,4 +34,16 @@ db.exec(`
   );
 `)
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS experience (
+    id          INTEGER PRIMARY KEY,
+    total_xp    INTEGER NOT NULL DEFAULT 0,
+    level       INTEGER NOT NULL DEFAULT 1,
+    updated_at  TEXT    NOT NULL DEFAULT datetime('now')
+  );
+  
+  -- Guarantee that there's always a row for the experience data
+  INSERT OR IGNORE INTO experience (id, total_xp, level) VALUES (1, 0, 1);
+`)
+
 export default db
