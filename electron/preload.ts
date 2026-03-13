@@ -7,4 +7,6 @@ contextBridge.exposeInMainWorld('api', {
   getHistory: () => ipcRenderer.invoke('db:getHistory'),
   setSetting: (key: SettingKey, value: string) => ipcRenderer.invoke('db.setSetting', key, value),
   getSetting: (key: SettingKey) => ipcRenderer.invoke('db.getSetting', key),
+  getXP: () => ipcRenderer.invoke('db:getExperience'),
+  addXP: (amount: number) => ipcRenderer.invoke('db:addExperience', amount),
 })

@@ -34,6 +34,7 @@ export interface Question {
   options: string[]
   playMode: 'ascending' | 'descending' | 'harmonic' | 'block' | 'arpeggio'
   progression?: { rootNote: string; chordType: string }[]
+  difficulty: Difficulty
 }
 
 export interface ExerciseResult {

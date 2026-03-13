@@ -9,6 +9,7 @@ function makeResults(correct: boolean[]): ExerciseResult[] {
       correct: 'Maior',
       options: [],
       playMode: 'block',
+      difficulty: 'beginner',
     },
     userAnswer: isCorrect ? 'Maior' : 'Menor',
     isCorrect,

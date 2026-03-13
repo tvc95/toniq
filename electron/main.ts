@@ -121,4 +121,46 @@ ipcMain.handle('db:getSetting', (_event, key) => {
   return db.prepare('SELECT value FROM settings WHERE key = ?').get(key)
 })
 
+/**
+ * Experience and Leveling System
+ */
+ipcMain.handle('db:getExperience', () => {
+  return db.prepare('SELECT * FROM experience WHERE id = 1').get()
+})
+
+/**
+ * Adds experience points and updates level if necessary. Returns updated XP and level info.
+ */
+ipcMain.handle('db:addExperience', (_event, xpToAdd: number) => {
+  const current = db.prepare('SELECT * FROM experience WHERE id = 1').get() as {
+    total_xp: number
+    level: number
+  }
+  const newTotalXp = current.total_xp + xpToAdd
+  const newLevel = calculateLevel(newTotalXp)
+  const now = new Date().toISOString()
+
+  db.prepare('UPDATE experience SET total_xp = ?, level = ?, updated_at = ? WHERE id = 1').run(
+    newTotalXp,
+    newLevel,
+    now
+  )
+
+  return { total_xp: newTotalXp, level: newLevel, leveled_up: newLevel > current.level }
+})
+
+/**
+ * Helper function to calculate level based on total experience points.
+ * Uses an exponential formula to make leveling up progressively harder.
+ * @param totalXP - Total experience points accumulated by the user.
+ * @returns calculated level based on total XP.
+ */
+function calculateLevel(totalXP: number): number {
+  let level = 1
+  while (totalXP >= Math.floor(100 * Math.pow(level, 1.8))) {
+    level++
+  }
+  return level
+}
+
 app.whenReady().then(createWindow)
