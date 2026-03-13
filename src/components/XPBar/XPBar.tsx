@@ -1,21 +1,22 @@
-import { xpForNextLevel } from '../../utils/xpCalculator'
-
 interface XPBarProps {
   currentLevel: number
   totalXp: number
 }
 
 export function XPBar({ currentLevel, totalXp }: XPBarProps) {
-  const current = xpForNextLevel(currentLevel - 1)
-  const next = xpForNextLevel(currentLevel)
-  const percent = Math.round(((totalXp - current) / (next - current)) * 100)
+  const current = Math.floor(100 * Math.pow(currentLevel - 1, 1.8))  // XP para entrar no nível atual
+  const next = Math.floor(100 * Math.pow(currentLevel, 1.8))
+
+  const xpIntoLevel = totalXp - current
+  const xpNeeded = next - current
+  const percent = Math.min(100, Math.round((xpIntoLevel / xpNeeded) * 100))
 
   return (
     <div style={{ width: '100%' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
         <span style={{ color: 'var(--color-primary)', fontWeight: 700 }}>Nível {currentLevel}</span>
         <span style={{ color: 'var(--color-text-muted)', fontSize: 12 }}>
-          {totalXp} / {next} XP
+          {xpIntoLevel} / {xpNeeded} XP
         </span>
       </div>
       <div
