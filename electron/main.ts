@@ -131,17 +131,20 @@ ipcMain.handle('db:getExperience', () => {
 /**
  * Adds experience points and updates level if necessary. Returns updated XP and level info.
  */
-ipcMain.handle('db:addExperience', (_event, xpToAdd) => {
-  const current = db.prepare('SELECT total_xp, level FROM experience WHERE id = 1').get() as {
+ipcMain.handle('db:addExperience', (_event, xpToAdd: number) => {
+  const current = db.prepare('SELECT * FROM experience WHERE id = 1').get() as {
     total_xp: number
     level: number
   }
   const newTotalXp = current.total_xp + xpToAdd
   const newLevel = calculateLevel(newTotalXp)
+  const now = new Date().toISOString()
 
-  db.prepare(
-    'UPDATE experience SET total_xp = ?, level = ?, updated_at = datetime("now") WHERE id = 1'
-  ).run(newTotalXp, newLevel)
+  db.prepare('UPDATE experience SET total_xp = ?, level = ?, updated_at = ? WHERE id = 1').run(
+    newTotalXp,
+    newLevel,
+    now
+  )
 
   return { total_xp: newTotalXp, level: newLevel, leveled_up: newLevel > current.level }
 })
