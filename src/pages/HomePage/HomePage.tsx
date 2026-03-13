@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom'
 import type { ExerciseConfig } from '../../types/db'
 import logo from '../../assets/toniq-logo.png'
+import { XPBar } from '../../components/XPBar/XPBar'
+import { useXP } from '../../hooks/useXP'
 
 const MODES = [
   {
@@ -28,6 +30,7 @@ const MODES = [
 
 export default function HomePage() {
   const navigate = useNavigate()
+  const { totalXP, level } = useXP()
 
   function handleStart(mode: ExerciseConfig['mode']) {
     navigate('/exercise', {
@@ -56,6 +59,7 @@ export default function HomePage() {
         </button>
       </header>
 
+      <XPBar totalXp={totalXP} currentLevel={level} />
       <section className="space-y-4">
         <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-secondary)' }}>
           Escolha um modo
