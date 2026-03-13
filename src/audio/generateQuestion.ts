@@ -118,6 +118,7 @@ export function generateQuestion(config: ExerciseConfig): Question {
       correct,
       options,
       playMode,
+      difficulty,
     }
   }
 
@@ -136,6 +137,7 @@ export function generateQuestion(config: ExerciseConfig): Question {
       correct,
       options,
       playMode,
+      difficulty,
     }
   }
 
@@ -162,5 +164,6 @@ export function generateQuestion(config: ExerciseConfig): Question {
     options,
     playMode: 'block',
     progression,
+    difficulty,
   }
 }
