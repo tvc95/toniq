@@ -4,7 +4,7 @@ interface XPBarProps {
 }
 
 export function XPBar({ currentLevel, totalXp }: XPBarProps) {
-  const current = Math.floor(100 * Math.pow(currentLevel - 1, 1.8))  // XP para entrar no nível atual
+  const current = Math.floor(100 * Math.pow(currentLevel - 1, 1.8))
   const next = Math.floor(100 * Math.pow(currentLevel, 1.8))
 
   const xpIntoLevel = totalXp - current

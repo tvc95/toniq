@@ -49,7 +49,7 @@ export default function Results() {
     addXP(total).then((result: AddXPResult) => {
       if (result.leveled_up) setLeveledUp(true)
     })
-  }, [])
+  }, [addXP, results])
 
   return (
     <div className="min-h-screen p-8 flex flex-col gap-8 max-w-lg mx-auto">
