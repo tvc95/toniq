@@ -10,13 +10,12 @@
 ![Electron](https://img.shields.io/badge/Electron-30-47848F?style=flat-square&logo=electron)
 ![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript)
-![Tests](https://img.shields.io/badge/tests-34%20passing-2EC4B6?style=flat-square)
+![Tests](https://img.shields.io/badge/tests-43%20passing-2EC4B6?style=flat-square)
 ![License](https://img.shields.io/badge/license-MIT-FFB703?style=flat-square)
 
 Status: Published (v. 1.1.0)
 
 </div>
-
 
 ---
 
@@ -29,7 +28,6 @@ The app covers three core areas of musical ear training:
 - **Intervals** — identify the distance between two notes (ascending, descending, or harmonic)
 - **Chords** — recognize triads and seventh chords (major, minor, diminished, augmented, dominant 7th...)
 - **Progressions** — identify common harmonic sequences (I–IV–V–I, ii–V–I, and more)
-
 
 ---
 
@@ -46,19 +44,18 @@ The app covers three core areas of musical ear training:
 
 ## 🛠️ Tech Stack
 
-| Technology | Role |
-|---|---|
-| **Electron 30** | Desktop app framework |
-| **React 18** | UI with hooks and Context API |
-| **TypeScript 5** | Static typing across the entire codebase |
-| **Tone.js** | Real-time audio synthesis and scheduling |
-| **better-sqlite3** | Local database for session history |
-| **Vite 5** | Bundler with HMR for the renderer process |
+| Technology          | Role                                            |
+| ------------------- | ----------------------------------------------- |
+| **Electron 30**     | Desktop app framework                           |
+| **React 18**        | UI with hooks and Context API                   |
+| **TypeScript 5**    | Static typing across the entire codebase        |
+| **Tone.js**         | Real-time audio synthesis and scheduling        |
+| **better-sqlite3**  | Local database for session history              |
+| **Vite 5**          | Bundler with HMR for the renderer process       |
 | **Tailwind CSS v4** | Utility-first styling with custom design system |
-| **Vitest 4** | Unit testing for music theory logic |
+| **Vitest 4**        | Unit testing for music theory logic             |
 
 ---
-
 
 ## 🏗️ Architecture
 
@@ -83,10 +80,10 @@ The app follows Electron's recommended security architecture with strict process
 - Tone.js runs entirely in the renderer — audio synthesis requires no IPC round-trips
 - Adaptive difficulty evaluated client-side on every answer using a sliding window of results
 
-
 ---
 
 ## 📁 Project Structure (simplified)
+
 Updated for v 1.1.0
 
 ```
@@ -122,6 +119,7 @@ toniq/
     ├── e2e/
     │   └── app.test.ts
     └── unit/
+        ├── xpCalculator.test.ts
         ├── musicTheoryData.test.ts
         ├── generateQuestion.test.ts
         └── adaptiveDifficulty.test.ts
@@ -162,7 +160,6 @@ npm run dev
 npm test
 ```
 
-
 ### Production Build
 
 ```bash
@@ -170,6 +167,7 @@ npm run build
 ```
 
 Installers are generated in `release/{version}/`:
+
 - Windows: `Toniq-Windows-{version}-Setup.exe`
 - macOS: `Toniq-Mac-{version}-Installer.dmg`
 - Linux: `Toniq-Linux-{version}.AppImage`
@@ -184,12 +182,13 @@ The test suite covers the core music theory logic and exercise generation:
 ✓ tests/unit/adaptiveDifficulty.test.ts   (6 tests)
 ✓ tests/unit/musicTheoryData.test.ts      (17 tests)
 ✓ tests/unit/generateQuestion.test.ts     (11 tests)
+✓ tests/unit/xpCalculator.test.ts         (9 tests) [NEW v.1.1.0]
 
-Test Files  3 passed (3)
-     Tests  34 passed (34)
+Test Files  4 passed (4)
+     Tests  43 passed (43)
 ```
 
-Tests are intentionally scoped to pure logic — no audio playback, no Electron APIs, no DOM required.
+Unit tests are intentionally scoped to pure logic — no audio playback, no Electron APIs, no DOM required.
 
 ---
 
@@ -202,7 +201,7 @@ All sound is synthesized in real-time using a `PolySynth` with a triangle oscill
 ```typescript
 const synth = new Tone.PolySynth(Tone.Synth, {
   oscillator: { type: 'triangle' },
-  envelope: { attack: 0.02, decay: 0.3, sustain: 0.4, release: 1.2 }
+  envelope: { attack: 0.02, decay: 0.3, sustain: 0.4, release: 1.2 },
 }).toDestination()
 ```
 
@@ -229,6 +228,7 @@ Session data is stored locally in a SQLite database via `better-sqlite3`. No acc
 ---
 
 ## Contributing
+
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 Please make sure to update tests as appropriate.
@@ -239,7 +239,7 @@ Please make sure to update tests as appropriate.
 2. Create a new branch with your changes: `git checkout -b my-feature`
 3. Save your changes and create a commit message telling you what you did: `git commit -m" feature: My new feature "`
 4. Submit your changes: `git push origin my-feature`
-> If you have any questions check this [guide on how to contribute](./CONTRIBUTING.md)
+   > If you have any questions check this [guide on how to contribute](./CONTRIBUTING.md)
 
 ---
 
@@ -250,6 +250,7 @@ This project was developed by [Thiago Viana](https://www.linkedin.com/in/thiagov
 MIT © 2026 — built as a portfolio project.
 
 ### Contact me
+
 <p align="left">
 	<a href="https://www.linkedin.com/in/thiagovcarvalho/"><img src="https://img.shields.io/static/v1?label=linkedin&message=thiagovcarvalho&color=blue&style=flat-square&logo=linkedin" /></a>
 	<a href="https://github.com/tvc95/"><img src="https://img.shields.io/static/v1?label=github&message=tvc95&color=blueviolet&style=flat-square&logo=github" /></a>
