@@ -39,11 +39,13 @@ db.exec(`
     id          INTEGER PRIMARY KEY,
     total_xp    INTEGER NOT NULL DEFAULT 0,
     level       INTEGER NOT NULL DEFAULT 1,
-    updated_at  TEXT    NOT NULL DEFAULT datetime('now')
+    updated_at  TEXT    NOT NULL DEFAULT ''
   );
-  
-  -- Guarantee that there's always a row for the experience data
-  INSERT OR IGNORE INTO experience (id, total_xp, level) VALUES (1, 0, 1);
 `)
+
+db.prepare(
+  `INSERT OR IGNORE INTO experience (id, total_xp, level, updated_at)
+  VALUES (1, 0, 1, datetime('now'))`
+).run()
 
 export default db
