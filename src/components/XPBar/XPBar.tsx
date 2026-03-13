@@ -3,6 +3,12 @@ interface XPBarProps {
   totalXp: number
 }
 
+/**
+ * XPBar component that displays the current level and the progress towards the next level based on total XP.
+ * @param { currentLevel } - The current level of the player.
+ * @param { totalXp } - The total experience points of the player.
+ * @returns a React component that renders the XP bar with current level and progress.
+ */
 export function XPBar({ currentLevel, totalXp }: XPBarProps) {
   const current = Math.floor(100 * Math.pow(currentLevel - 1, 1.8))
   const next = Math.floor(100 * Math.pow(currentLevel, 1.8))

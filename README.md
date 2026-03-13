@@ -6,14 +6,14 @@
 
 **Train your musical ear through interactive exercises powered by real-time audio synthesis**
 
-![Version](https://img.shields.io/badge/version-1.0.0-6C63FF?style=flat-square)
+![Version](https://img.shields.io/badge/version-1.1.0-6C63FF?style=flat-square)
 ![Electron](https://img.shields.io/badge/Electron-30-47848F?style=flat-square&logo=electron)
 ![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript)
 ![Tests](https://img.shields.io/badge/tests-34%20passing-2EC4B6?style=flat-square)
 ![License](https://img.shields.io/badge/license-MIT-FFB703?style=flat-square)
 
-Status: Published (v. 1.0.0)
+Status: Published (v. 1.1.0)
 
 </div>
 
@@ -87,6 +87,7 @@ The app follows Electron's recommended security architecture with strict process
 ---
 
 ## 📁 Project Structure (simplified)
+Updated for v 1.1.0
 
 ```
 toniq/
@@ -101,6 +102,9 @@ toniq/
 │   │   ├── musicTheoryData.ts        # Intervals, chords, progressions and transposition
 │   │   ├── generateQuestion.ts       # TonIQ exercises generation
 │   │   └── adaptiveDifficulty.ts     # Difficulty adjustment logic
+│   ├── components/
+│   │   ├── Waveform/Waveform.tsx     # Audio Waveform Canvas
+│   │   └── XPBar.tsx                 # Level progress bar
 │   ├── hooks/
 │   │   ├── useExercise.ts        # Exercise session state machine
 │   │   └── useProgress.ts        # Session persistence abstraction
@@ -109,10 +113,14 @@ toniq/
 │   │   ├── Exercise/Exercise.tsx         # Active exercise screen
 │   │   ├── Results/Results.tsx           # Session summary
 │   │   └── HistoryPage/HistoryPage.tsx   # Progress history
-│   └── types/
-│       ├── db.ts         # Session, Answer, ExerciseConfig types
-│       └── api.d.ts      # window.api type declarations
+│   ├── types/
+│   │   ├── db.ts         # Session, Answer, ExerciseConfig types
+│   │   └── api.d.ts      # window.api type declarations
+│   └── utils/
+│       └── xpCalculator.ts      # Player XP calculation
 └── tests/
+    ├── e2e/
+    │   └── app.test.ts
     └── unit/
         ├── musicTheoryData.test.ts
         ├── generateQuestion.test.ts
