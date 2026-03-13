@@ -1,11 +1,11 @@
 import { xpForNextLevel } from '../../utils/xpCalculator'
 
 interface XPBarProps {
-  totalXp: number
   currentLevel: number
+  totalXp: number
 }
 
-export function XPBar({ totalXp, currentLevel }: XPBarProps) {
+export function XPBar({ currentLevel, totalXp }: XPBarProps) {
   const current = xpForNextLevel(currentLevel - 1)
   const next = xpForNextLevel(currentLevel)
   const percent = Math.round(((totalXp - current) / (next - current)) * 100)

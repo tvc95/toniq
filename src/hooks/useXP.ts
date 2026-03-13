@@ -39,11 +39,13 @@ export function useXP() {
    */
   const addXP = useCallback(async (amount: number) => {
     const result = await window.api.addXP(amount)
+
     setXp({
       totalXP: result.total_xp,
       level: result.level,
       isLeveledUp: result.leveled_up,
     })
+
     return result
   }, [])
 
@@ -54,10 +56,7 @@ export function useXP() {
   const progressPercent = () => {
     const currentLevelXP = xpForNextLevel(xp.level - 1)
     const nextLevelXP = xpForNextLevel(xp.level)
-    const xpIntoCurrentLevel = xp.totalXP - currentLevelXP
-    const xpNeededForNextLevel = nextLevelXP - currentLevelXP
-
-    return Math.min(100, (xpIntoCurrentLevel / xpNeededForNextLevel) * 100)
+    return Math.round(((xp.totalXP - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100)
   }
 
   return {

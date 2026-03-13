@@ -1,5 +1,8 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import type { ExerciseConfig, ExerciseResult } from '../../types/db'
+import { useXP } from '../../hooks/useXP'
+import { calculateXp } from '../../utils/xpCalculator'
+import { useEffect, useState } from 'react'
 
 interface ResultsState {
   results: ExerciseResult[]
@@ -8,6 +11,10 @@ interface ResultsState {
 }
 
 export default function Results() {
+  const { addXP } = useXP()
+  const [sessionXp, setSessionXp] = useState(0)
+  const [leveledUp, setLeveledUp] = useState(false)
+
   const location = useLocation()
   const navigate = useNavigate()
   const { results, score, config } = location.state as ResultsState
@@ -23,6 +30,27 @@ export default function Results() {
     return '🥉'
   }
 
+  useEffect(() => {
+    let combo = 0
+    let total = 0
+
+    results.forEach(r => {
+      if (r.isCorrect) {
+        combo++
+      } else {
+        combo = 0
+      }
+
+      const responseTime = r.responseTime_ms ?? 8
+      total += calculateXp(r.isCorrect, r.question.difficulty, responseTime, combo)
+    })
+
+    setSessionXp(total)
+    addXP(total).then((result: AddXPResult) => {
+      if (result.leveled_up) setLeveledUp(true)
+    })
+  }, [])
+
   return (
     <div className="min-h-screen p-8 flex flex-col gap-8 max-w-lg mx-auto">
       <header className="text-center space-y-2 pt-4">
@@ -32,6 +60,17 @@ export default function Results() {
         </h1>
         <p style={{ color: 'var(--color-text-secondary)' }}>Sessão encerrada</p>
       </header>
+
+      <div style={{ textAlign: 'center', margin: '16px 0' }}>
+        <span style={{ color: 'var(--color-warning)', fontWeight: 700, fontSize: 20 }}>
+          +{sessionXp} XP
+        </span>
+        {leveledUp && (
+          <div style={{ color: 'var(--color-secondary)', fontWeight: 700, marginTop: 8 }}>
+            🎉 Subiu de nível!
+          </div>
+        )}
+      </div>
 
       <div className="grid grid-cols-3 gap-3">
         {[
