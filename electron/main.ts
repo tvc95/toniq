@@ -70,6 +70,20 @@ app.on('activate', () => {
 })
 
 /**
+ * Helper function to calculate level based on total experience points.
+ * Uses an exponential formula to make leveling up progressively harder.
+ * @param totalXP - Total experience points accumulated by the user.
+ * @returns calculated level based on total XP.
+ */
+function calculateLevel(totalXP: number): number {
+  let level = 1
+  while (totalXP >= Math.floor(100 * Math.pow(level, 1.8))) {
+    level++
+  }
+  return level
+}
+
+/**
  * Saves full session
  */
 ipcMain.handle('db:saveSession', (_event, data) => {
@@ -150,17 +164,56 @@ ipcMain.handle('db:addExperience', (_event, xpToAdd: number) => {
 })
 
 /**
- * Helper function to calculate level based on total experience points.
- * Uses an exponential formula to make leveling up progressively harder.
- * @param totalXP - Total experience points accumulated by the user.
- * @returns calculated level based on total XP.
+ * Returns the user's current practice streak data.
  */
-function calculateLevel(totalXP: number): number {
-  let level = 1
-  while (totalXP >= Math.floor(100 * Math.pow(level, 1.8))) {
-    level++
+ipcMain.handle('db:getStreak', () => {
+  return db.prepare('SELECT * FROM streak WHERE id = 1').get()
+})
+
+/**
+ * Updates the user's practice streak based on their activity.
+ * Returns the updated streak information.
+ */
+ipcMain.handle('db:updateStreak', () => {
+  const row = db.prepare('SELECT * FROM streak WHERE id = 1').get() as {
+    current: number
+    best: number
+    last_active: string
   }
-  return level
-}
+
+  const today = new Date().toISOString().slice(0, 10)
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10)
+
+  let newCurrent = row.current
+
+  if (row.last_active === today) {
+    // Player already practiced today
+    return {
+      current: row.current,
+      best: row.best,
+      last_active: row.last_active,
+    }
+  } else if (row.last_active === yesterday) {
+    // Player practiced yesterday: update to today
+    newCurrent = row.current + 1
+  } else {
+    // Player lost streak: restart
+    newCurrent = 1
+  }
+
+  const newBest = Math.max(newCurrent, row.best)
+
+  db.prepare(`UPDATE streak SET current = ?, best = ?, last_active = ? WHERE id = 1`).run(
+    newCurrent,
+    newBest,
+    today
+  )
+
+  return {
+    current: newCurrent,
+    best: newBest,
+    last_active: today,
+  }
+})
 
 app.whenReady().then(createWindow)
