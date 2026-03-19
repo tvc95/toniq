@@ -3,6 +3,8 @@ import type { ExerciseConfig } from '../../types/db'
 import logo from '../../assets/toniq-logo.png'
 import { XPBar } from '../../components/XPBar/XPBar'
 import { useXP } from '../../hooks/useXP'
+import { useStreak } from '../../hooks/useStreak'
+import { StreakBadge } from '../../components/StreakBadge/StreakBadge'
 
 const MODES = [
   {
@@ -31,6 +33,7 @@ const MODES = [
 export default function HomePage() {
   const navigate = useNavigate()
   const { totalXP, level } = useXP()
+  const { current, best, practicedToday } = useStreak()
 
   function handleStart(mode: ExerciseConfig['mode']) {
     navigate('/exercise', {
@@ -59,7 +62,13 @@ export default function HomePage() {
         </button>
       </header>
 
-      <XPBar totalXp={totalXP} currentLevel={level} />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
+        <div style={{ flex: 1 }}>
+          <XPBar totalXp={totalXP} currentLevel={level} />
+        </div>
+        <StreakBadge current={current} best={best} practicedToday={practicedToday} />
+      </div>
+
       <section className="space-y-4">
         <h2 className="text-lg font-semibold" style={{ color: 'var(--color-text-secondary)' }}>
           Escolha um modo

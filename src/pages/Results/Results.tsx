@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import type { ExerciseConfig, ExerciseResult } from '../../types/db'
 import { useXP } from '../../hooks/useXP'
+import { useStreak } from '../../hooks/useStreak'
 import { calculateXp } from '../../utils/xpCalculator'
 import { useEffect, useState } from 'react'
 
@@ -12,6 +13,7 @@ interface ResultsState {
 
 export default function Results() {
   const { addXP } = useXP()
+  const { updateStreak, current: streakCurrent } = useStreak()
   const [sessionXp, setSessionXp] = useState(0)
   const [leveledUp, setLeveledUp] = useState(false)
 
@@ -30,26 +32,28 @@ export default function Results() {
     return '🥉'
   }
 
+  // Update XP and streak when results change
   useEffect(() => {
     let combo = 0
     let total = 0
 
     results.forEach(r => {
-      if (r.isCorrect) {
-        combo++
-      } else {
-        combo = 0
-      }
+      if (r.isCorrect) combo++
+      else combo = 0
 
       const responseTime = r.responseTime_ms ?? 8
       total += calculateXp(r.isCorrect, r.question.difficulty, responseTime, combo)
     })
 
     setSessionXp(total)
-    addXP(total).then((result: AddXPResult) => {
-      if (result.leveled_up) setLeveledUp(true)
-    })
-  }, [addXP, results])
+
+    Promise.all([
+      addXP(total).then((result: AddXPResult) => {
+        if (result.leveled_up) setLeveledUp(true)
+      }),
+      updateStreak(),
+    ])
+  }, [addXP, results, updateStreak])
 
   return (
     <div className="min-h-screen p-8 flex flex-col gap-8 max-w-lg mx-auto">
@@ -61,6 +65,9 @@ export default function Results() {
         <p style={{ color: 'var(--color-text-secondary)' }}>Sessão encerrada</p>
       </header>
 
+      <div style={{ color: 'var(--color-text-muted)', fontSize: 13, marginTop: 4 }}>
+        🔥 Sequência atual: {streakCurrent} {streakCurrent === 1 ? 'dia' : 'dias'}
+      </div>
       <div style={{ textAlign: 'center', margin: '16px 0' }}>
         <span style={{ color: 'var(--color-warning)', fontWeight: 700, fontSize: 20 }}>
           +{sessionXp} XP
