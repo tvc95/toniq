@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain } from 'electron'
 import db from './database'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
+import { calculateStreak } from '../src/utils/streakCalculator'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -175,45 +176,19 @@ ipcMain.handle('db:getStreak', () => {
  * Returns the updated streak information.
  */
 ipcMain.handle('db:updateStreak', () => {
-  const row = db.prepare('SELECT * FROM streak WHERE id = 1').get() as {
-    current: number
-    best: number
-    last_active: string
-  }
-
+  const row = db.prepare('SELECT * FROM streak WHERE id = 1').get() as StreakData
   const today = new Date().toISOString().slice(0, 10)
-  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10)
+  const result = calculateStreak(row, today)
 
-  let newCurrent = row.current
-
-  if (row.last_active === today) {
-    // Player already practiced today
-    return {
-      current: row.current,
-      best: row.best,
-      last_active: row.last_active,
-    }
-  } else if (row.last_active === yesterday) {
-    // Player practiced yesterday: update to today
-    newCurrent = row.current + 1
-  } else {
-    // Player lost streak: restart
-    newCurrent = 1
-  }
-
-  const newBest = Math.max(newCurrent, row.best)
+  if (result === row) return result // no change in streak
 
   db.prepare(`UPDATE streak SET current = ?, best = ?, last_active = ? WHERE id = 1`).run(
-    newCurrent,
-    newBest,
-    today
+    result.current,
+    result.best,
+    result.last_active
   )
 
-  return {
-    current: newCurrent,
-    best: newBest,
-    last_active: today,
-  }
+  return result
 })
 
 app.whenReady().then(createWindow)
