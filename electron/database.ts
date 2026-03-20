@@ -48,4 +48,18 @@ db.prepare(
   VALUES (1, 0, 1, datetime('now'))`
 ).run()
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS streak (
+    id           INTEGER PRIMARY KEY,
+    current      INTEGER NOT NULL DEFAULT 0,
+    best         INTEGER NOT NULL DEFAULT 0,
+    last_active  TEXT NOT NULL DEFAULT ''
+  );
+`)
+
+db.prepare(
+  `INSERT OR IGNORE INTO streak (id, current, best, last_active)
+  VALUES (1, 0, 0, '')`
+).run()
+
 export default db

@@ -6,14 +6,14 @@
 
 **Train your musical ear through interactive exercises powered by real-time audio synthesis**
 
-![Version](https://img.shields.io/badge/version-1.1.0-6C63FF?style=flat-square)
+![Version](https://img.shields.io/badge/version-1.1.1-6C63FF?style=flat-square)
 ![Electron](https://img.shields.io/badge/Electron-30-47848F?style=flat-square&logo=electron)
 ![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript)
-![Tests](https://img.shields.io/badge/tests-43%20passing-2EC4B6?style=flat-square)
+![Tests](https://img.shields.io/badge/tests-49%20passing-2EC4B6?style=flat-square)
 ![License](https://img.shields.io/badge/license-MIT-FFB703?style=flat-square)
 
-Status: Published (v. 1.1.0)
+Status: Published (v. 1.1.1)
 
 </div>
 
@@ -54,6 +54,7 @@ The app covers three core areas of musical ear training:
 | **Vite 5**          | Bundler with HMR for the renderer process       |
 | **Tailwind CSS v4** | Utility-first styling with custom design system |
 | **Vitest 4**        | Unit testing for music theory logic             |
+| **Playwright**      | End-to-end testing                              |
 
 ---
 
@@ -84,7 +85,7 @@ The app follows Electron's recommended security architecture with strict process
 
 ## 📁 Project Structure (simplified)
 
-Updated for v 1.1.0
+Updated for v 1.1.1
 
 ```
 toniq/
@@ -100,11 +101,13 @@ toniq/
 │   │   ├── generateQuestion.ts       # TonIQ exercises generation
 │   │   └── adaptiveDifficulty.ts     # Difficulty adjustment logic
 │   ├── components/
-│   │   ├── Waveform/Waveform.tsx     # Audio Waveform Canvas
-│   │   └── XPBar.tsx                 # Level progress bar
+│   │   ├── Waveform/Waveform.tsx         # Audio Waveform Canvas
+│   │   ├── StreakBadge/StreakBadge.tsx   # Player Streak Badge
+│   │   └── XPBar.tsx                     # Level progress bar
 │   ├── hooks/
 │   │   ├── useExercise.ts        # Exercise session state machine
-│   │   └── useProgress.ts        # Session persistence abstraction
+│   │   ├── useProgress.ts        # Session persistence abstraction
+│   │   └── ...
 │   ├── pages/
 │   │   ├── HomePage/HomePage.tsx         # Mode selection
 │   │   ├── Exercise/Exercise.tsx         # Active exercise screen
@@ -114,7 +117,8 @@ toniq/
 │   │   ├── db.ts         # Session, Answer, ExerciseConfig types
 │   │   └── api.d.ts      # window.api type declarations
 │   └── utils/
-│       └── xpCalculator.ts      # Player XP calculation
+│       ├── xpCalculator.ts      # Player XP calculation
+│       └── streakCalculator.ts  # Player streak calculation
 └── tests/
     ├── e2e/
     │   └── app.test.ts
@@ -182,10 +186,11 @@ The test suite covers the core music theory logic and exercise generation:
 ✓ tests/unit/adaptiveDifficulty.test.ts   (6 tests)
 ✓ tests/unit/musicTheoryData.test.ts      (17 tests)
 ✓ tests/unit/generateQuestion.test.ts     (11 tests)
-✓ tests/unit/xpCalculator.test.ts         (9 tests) [NEW v.1.1.0]
+✓ tests/unit/xpCalculator.test.ts         (9 tests) 
+✓ tests/unit/streakCalculator.test.ts     (6 tests) [NEW v.1.1.1]
 
-Test Files  4 passed (4)
-     Tests  43 passed (43)
+Test Files  5 passed (5)
+     Tests  49 passed (49)
 ```
 
 Unit tests are intentionally scoped to pure logic — no audio playback, no Electron APIs, no DOM required.
@@ -254,5 +259,4 @@ MIT © 2026 — built as a portfolio project.
 <p align="left">
 	<a href="https://www.linkedin.com/in/thiagovcarvalho/"><img src="https://img.shields.io/static/v1?label=linkedin&message=thiagovcarvalho&color=blue&style=flat-square&logo=linkedin" /></a>
 	<a href="https://github.com/tvc95/"><img src="https://img.shields.io/static/v1?label=github&message=tvc95&color=blueviolet&style=flat-square&logo=github" /></a>
-	<a href="#"><img src="https://img.shields.io/static/v1?label=gmail&message=thiagovc1500@gmail.com&color=critical&style=flat-square&logo=gmail" /></a>
 </p>

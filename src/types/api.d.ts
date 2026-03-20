@@ -9,6 +9,12 @@ interface AddXPResult {
   leveled_up: boolean
 }
 
+interface StreakData {
+  current: number
+  best: number
+  last_active: string
+}
+
 interface Window {
   api: {
     saveSession: (data: SessionData) => Promise<void>
@@ -16,5 +22,7 @@ interface Window {
     playAudio: (config: AudioConfig) => Promise<void>
     getXP: () => Promise<XPData>
     addXP: (amount: number) => Promise<AddXPResult>
+    getStreak: () => Promise<StreakData>
+    updateStreak: () => Promise<StreakData>
   }
 }

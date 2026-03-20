@@ -9,4 +9,6 @@ contextBridge.exposeInMainWorld('api', {
   getSetting: (key: SettingKey) => ipcRenderer.invoke('db.getSetting', key),
   getXP: () => ipcRenderer.invoke('db:getExperience'),
   addXP: (amount: number) => ipcRenderer.invoke('db:addExperience', amount),
+  getStreak: () => ipcRenderer.invoke('db:getStreak'),
+  updateStreak: () => ipcRenderer.invoke('db:updateStreak'),
 })

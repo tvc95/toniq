@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain } from 'electron'
 import db from './database'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
+import { calculateStreak } from '../src/utils/streakCalculator'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -68,6 +69,20 @@ app.on('activate', () => {
     createWindow()
   }
 })
+
+/**
+ * Helper function to calculate level based on total experience points.
+ * Uses an exponential formula to make leveling up progressively harder.
+ * @param totalXP - Total experience points accumulated by the user.
+ * @returns calculated level based on total XP.
+ */
+function calculateLevel(totalXP: number): number {
+  let level = 1
+  while (totalXP >= Math.floor(100 * Math.pow(level, 1.8))) {
+    level++
+  }
+  return level
+}
 
 /**
  * Saves full session
@@ -150,17 +165,30 @@ ipcMain.handle('db:addExperience', (_event, xpToAdd: number) => {
 })
 
 /**
- * Helper function to calculate level based on total experience points.
- * Uses an exponential formula to make leveling up progressively harder.
- * @param totalXP - Total experience points accumulated by the user.
- * @returns calculated level based on total XP.
+ * Returns the user's current practice streak data.
  */
-function calculateLevel(totalXP: number): number {
-  let level = 1
-  while (totalXP >= Math.floor(100 * Math.pow(level, 1.8))) {
-    level++
-  }
-  return level
-}
+ipcMain.handle('db:getStreak', () => {
+  return db.prepare('SELECT * FROM streak WHERE id = 1').get()
+})
+
+/**
+ * Updates the user's practice streak based on their activity.
+ * Returns the updated streak information.
+ */
+ipcMain.handle('db:updateStreak', () => {
+  const row = db.prepare('SELECT * FROM streak WHERE id = 1').get() as StreakData
+  const today = new Date().toISOString().slice(0, 10)
+  const result = calculateStreak(row, today)
+
+  if (result === row) return result // no change in streak
+
+  db.prepare(`UPDATE streak SET current = ?, best = ?, last_active = ? WHERE id = 1`).run(
+    result.current,
+    result.best,
+    result.last_active
+  )
+
+  return result
+})
 
 app.whenReady().then(createWindow)
