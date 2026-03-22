@@ -15,6 +15,11 @@ interface StreakData {
   last_active: string
 }
 
+interface UnlockedAchievement {
+  id: string
+  unlocked_at: string
+}
+
 interface Window {
   api: {
     saveSession: (data: SessionData) => Promise<void>
@@ -24,5 +29,8 @@ interface Window {
     addXP: (amount: number) => Promise<AddXPResult>
     getStreak: () => Promise<StreakData>
     updateStreak: () => Promise<StreakData>
+    getAchievements: () => Promise<UnlockedAchievement[]>
+    unlockAchievements: (ids: string[]) => Promise<void>
+    checkAchievements: (stats: SessionStats) => Promise<string[]>
   }
 }

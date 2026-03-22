@@ -1,5 +1,6 @@
 import { ipcRenderer, contextBridge } from 'electron'
 import type { SaveSessionData, SettingKey } from '../src/types/db'
+import type { SessionStats } from '../src/utils/achievementChecker'
 
 // --------- Expose some API to the Renderer process ---------
 contextBridge.exposeInMainWorld('api', {
@@ -11,4 +12,7 @@ contextBridge.exposeInMainWorld('api', {
   addXP: (amount: number) => ipcRenderer.invoke('db:addExperience', amount),
   getStreak: () => ipcRenderer.invoke('db:getStreak'),
   updateStreak: () => ipcRenderer.invoke('db:updateStreak'),
+  getAchievements: () => ipcRenderer.invoke('db:getAchievements'),
+  unlockAchievements: (ids: string[]) => ipcRenderer.invoke('db:unlockAchievements', ids),
+  checkAchievements: (stats: SessionStats) => ipcRenderer.invoke('db:checkAchievements', stats),
 })
