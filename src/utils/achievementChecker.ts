@@ -1,5 +1,3 @@
-import { ACHIEVEMENTS_LIST } from './achievements'
-
 export interface SessionStats {
   totalSessions: number
   correctTotal: number
