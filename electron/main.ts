@@ -3,6 +3,7 @@ import db from './database'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import { calculateStreak } from '../src/utils/streakCalculator'
+import { checkAchievements, type SessionStats } from '../src/utils/achievementChecker'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -189,6 +190,56 @@ ipcMain.handle('db:updateStreak', () => {
   )
 
   return result
+})
+
+/**
+ * Returns a list of all achievements with their status.
+ */
+ipcMain.handle('db:getAchievements', () => {
+  return db.prepare('SELECT * FROM achievements').all()
+})
+
+/**
+ * Returns an unlocked list of achievements by their IDs.
+ */
+ipcMain.handle('db:unlockAchievements', (_event, ids: string[]) => {
+  const currentDate = new Date().toISOString()
+  const insert = db.prepare(`INSERT OR IGNORE INTO achievements (id, unlocked_at) VALUES (?, ?)`)
+
+  const insertMany = db.transaction((ids: string[]) => {
+    for (const id of ids) {
+      insert.run(id, currentDate)
+    }
+  })
+
+  insertMany(ids)
+  return ids
+})
+
+/**
+ * Checks which achievements should be unlocked based on the current session
+ * stats and already unlocked achievements.
+ */
+ipcMain.handle('db:checkAchievements', (_e, stats: SessionStats) => {
+  const unlocked = (db.prepare('SELECT id FROM achievements').all() as { id: string }[]).map(
+    a => a.id
+  )
+  const newlyUnlocked = checkAchievements(stats, unlocked)
+
+  if (newlyUnlocked.length > 0) {
+    const currentDate = new Date().toISOString()
+    const insert = db.prepare(`INSERT OR IGNORE INTO achievements (id, unlocked_at) VALUES (?, ?)`)
+
+    const insertMany = db.transaction((ids: string[]) => {
+      for (const id of ids) {
+        insert.run(id, currentDate)
+      }
+    })
+
+    insertMany(newlyUnlocked)
+  }
+
+  return newlyUnlocked
 })
 
 app.whenReady().then(createWindow)

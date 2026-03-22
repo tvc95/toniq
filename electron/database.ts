@@ -62,4 +62,11 @@ db.prepare(
   VALUES (1, 0, 0, '')`
 ).run()
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS achievements (
+    id          TEXT PRIMARY KEY,
+    unlocked_at TEXT NOT NULL DEFAULT ''
+  );
+`)
+
 export default db
