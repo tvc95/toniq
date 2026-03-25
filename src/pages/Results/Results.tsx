@@ -51,7 +51,7 @@ export default function Results() {
       total += calculateXp(r.isCorrect, r.question.difficulty, responseTime, combo)
     })
 
-    const maxCombo = results.reduce((acc, r, i) => {
+    const maxCombo = results.reduce((acc, _r, i) => {
       const combo = results
         .slice(0, i + 1)
         .reverse()
@@ -90,7 +90,7 @@ export default function Results() {
         }),
       updateStreak(),
     ])
-  }, [addXP, results, updateStreak])
+  }, [addXP, checkAndUnlock, results, score, streakCurrent, updateStreak])
 
   return (
     <div className="min-h-screen p-8 flex flex-col gap-8 max-w-lg mx-auto">
