@@ -2,8 +2,12 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import type { ExerciseConfig, ExerciseResult } from '../../types/db'
 import { useXP } from '../../hooks/useXP'
 import { useStreak } from '../../hooks/useStreak'
+import { useAchievements } from '../../hooks/useAchievements'
+import { AchievementToast } from '../../components/AchievementToast/AchievementToast'
 import { calculateXp } from '../../utils/xpCalculator'
+import type { SessionStats } from '../../utils/achievementChecker'
 import { useEffect, useState } from 'react'
+import { Achievement } from '../../utils/achievements'
 
 interface ResultsState {
   results: ExerciseResult[]
@@ -14,8 +18,10 @@ interface ResultsState {
 export default function Results() {
   const { addXP } = useXP()
   const { updateStreak, current: streakCurrent } = useStreak()
+  const { checkAndUnlock } = useAchievements()
   const [sessionXp, setSessionXp] = useState(0)
   const [leveledUp, setLeveledUp] = useState(false)
+  const [newAchievements, setNewAchievements] = useState<Achievement[]>([])
 
   const location = useLocation()
   const navigate = useNavigate()
@@ -45,18 +51,50 @@ export default function Results() {
       total += calculateXp(r.isCorrect, r.question.difficulty, responseTime, combo)
     })
 
+    const maxCombo = results.reduce((acc, r, i) => {
+      const combo = results
+        .slice(0, i + 1)
+        .reverse()
+        .findIndex(x => !x.isCorrect)
+      return Math.max(acc, combo === -1 ? i + 1 : combo)
+    }, 0)
+
+    const fastAnswers = results.filter(r => r.responseTime_ms < 2000).length
+
     setSessionXp(total)
 
     Promise.all([
-      addXP(total).then((result: AddXPResult) => {
-        if (result.leveled_up) setLeveledUp(true)
-      }),
+      addXP(total)
+        .then((result: AddXPResult) => {
+          if (result.leveled_up) setLeveledUp(true)
+
+          const stats: SessionStats = {
+            totalSessions: 0, // buscar do histórico se necessário
+            correctTotal: 0, // buscar do histórico
+            score: score,
+            total: results.length,
+            streakCurrent: streakCurrent,
+            level: result.level,
+            maxCombo,
+            fastAnswers,
+            modesCompleted: [], // buscar do histórico
+            modesWith80: [], // buscar do histórico
+            recentAccuracy: [], // buscar do histórico
+          }
+
+          return stats
+        })
+        .then(stats => checkAndUnlock(stats))
+        .then(unlocked => {
+          if (unlocked.length > 0) setNewAchievements(unlocked)
+        }),
       updateStreak(),
     ])
   }, [addXP, results, updateStreak])
 
   return (
     <div className="min-h-screen p-8 flex flex-col gap-8 max-w-lg mx-auto">
+      <AchievementToast achievements={newAchievements} onDone={() => setNewAchievements([])} />
       <header className="text-center space-y-2 pt-4">
         <p className="text-6xl">{medalEmoji()}</p>
         <h1 className="text-4xl font-bold" style={{ color: 'var(--color-primary)' }}>

@@ -60,6 +60,9 @@ export default function HomePage() {
         <button className="btn-ghost" onClick={() => navigate('/history')}>
           📊 Histórico
         </button>
+        <button className="btn-ghost" onClick={() => navigate('/achievements')}>
+          🏆 Conquistas
+        </button>
       </header>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
