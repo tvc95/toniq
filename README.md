@@ -6,14 +6,14 @@
 
 **Train your musical ear through interactive exercises powered by real-time audio synthesis**
 
-![Version](https://img.shields.io/badge/version-1.1.1-6C63FF?style=flat-square)
+![Version](https://img.shields.io/badge/version-1.2.0-6C63FF?style=flat-square)
 ![Electron](https://img.shields.io/badge/Electron-30-47848F?style=flat-square&logo=electron)
 ![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript)
-![Tests](https://img.shields.io/badge/tests-49%20passing-2EC4B6?style=flat-square)
+![Tests](https://img.shields.io/badge/tests-78%20passing-2EC4B6?style=flat-square)
 ![License](https://img.shields.io/badge/license-MIT-FFB703?style=flat-square)
 
-Status: Published (v. 1.1.1)
+Status: Published (v. 1.2.0)
 
 </div>
 
@@ -103,7 +103,8 @@ toniq/
 │   ├── components/
 │   │   ├── Waveform/Waveform.tsx         # Audio Waveform Canvas
 │   │   ├── StreakBadge/StreakBadge.tsx   # Player Streak Badge
-│   │   └── XPBar.tsx                     # Level progress bar
+│   │   ├── XPBar.tsx                     # Level progress bar
+│   │   └── ...
 │   ├── hooks/
 │   │   ├── useExercise.ts        # Exercise session state machine
 │   │   ├── useProgress.ts        # Session persistence abstraction
@@ -112,13 +113,15 @@ toniq/
 │   │   ├── HomePage/HomePage.tsx         # Mode selection
 │   │   ├── Exercise/Exercise.tsx         # Active exercise screen
 │   │   ├── Results/Results.tsx           # Session summary
-│   │   └── HistoryPage/HistoryPage.tsx   # Progress history
+│   │   ├── HistoryPage/HistoryPage.tsx   # Progress history
+│   │   └── ...
 │   ├── types/
 │   │   ├── db.ts         # Session, Answer, ExerciseConfig types
 │   │   └── api.d.ts      # window.api type declarations
 │   └── utils/
 │       ├── xpCalculator.ts      # Player XP calculation
-│       └── streakCalculator.ts  # Player streak calculation
+│       ├── streakCalculator.ts  # Player streak calculation
+│       └── ...
 └── tests/
     ├── e2e/
     │   └── app.test.ts
@@ -126,7 +129,8 @@ toniq/
         ├── xpCalculator.test.ts
         ├── musicTheoryData.test.ts
         ├── generateQuestion.test.ts
-        └── adaptiveDifficulty.test.ts
+        ├── adaptiveDifficulty.test.ts
+        └── ...
 ```
 
 ---
@@ -187,10 +191,11 @@ The test suite covers the core music theory logic and exercise generation:
 ✓ tests/unit/musicTheoryData.test.ts      (17 tests)
 ✓ tests/unit/generateQuestion.test.ts     (11 tests)
 ✓ tests/unit/xpCalculator.test.ts         (9 tests) 
-✓ tests/unit/streakCalculator.test.ts     (6 tests) [NEW v.1.1.1]
+✓ tests/unit/streakCalculator.test.ts     (6 tests)
+✓ tests/unit/achievementChecker.test.ts   (29 tests) [NEW v.1.2.0]
 
-Test Files  5 passed (5)
-     Tests  49 passed (49)
+Test Files  6 passed (6)
+     Tests  78 passed (78)
 ```
 
 Unit tests are intentionally scoped to pure logic — no audio playback, no Electron APIs, no DOM required.
